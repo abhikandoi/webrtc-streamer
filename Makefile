@@ -116,7 +116,7 @@ src/%.o: src/%.cpp $(LIBS)
 
 FILES = $(wildcard src/*.cpp)
 $(TARGET): $(subst .cpp,.o,$(FILES)) $(LIBS) 
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS) `pkg-config --cflags --libs opencv`
 
 clean:
 	rm -f src/*.o libWebRTC_$(GYP_GENERATOR_OUTPUT)_$(WEBRTCBUILD).a $(TARGET)
