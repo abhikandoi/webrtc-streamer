@@ -6,7 +6,7 @@
 ** HttpServerHandler.cpp
 **
 ** -------------------------------------------------------------------------*/
-#define _GLIBCXX_USE_CXX11_ABI 0
+
 #include <iostream>
 
 #include "HttpServerRequestHandler.h"
