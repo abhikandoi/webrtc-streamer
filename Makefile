@@ -97,9 +97,9 @@ LIBS+=libzmq/src/.libs/libzmq.a
 libzmq/Makefile:
 	git submodule update --init libzmq
 
-libzmq/.libs/libzmq.a: libzmq/Makefile
+libzmq/src/.libs/libzmq.a: libzmq/Makefile
 	cd libzmq && ./autogen.sh
-	cd libzmq && CC=$(CXX) ./configure --host=$(shell $(CXX) -dumpmachine)
+	cd libzmq && ./configure
 	make -C libzmq
 	make -C libzmq install
 
