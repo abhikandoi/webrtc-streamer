@@ -9,7 +9,7 @@
 
 #ifndef PEERCONNECTIONMANAGER_H_
 #define PEERCONNECTIONMANAGER_H_
-
+#define _GLIBCXX_USE_CXX11_ABI 0
 #include <string>
 
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"

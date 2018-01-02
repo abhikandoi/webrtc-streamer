@@ -1,6 +1,6 @@
 #ifndef ZMQFRAMEREADER_H_
 #define ZMQFRAMEREADER_H_
-
+#define _GLIBCXX_USE_CXX11_ABI 0
 #include <string.h>
 
 #include "rtc_base/thread.h"

@@ -6,7 +6,7 @@
 ** HttpServerHandler.h
 ** 
 ** -------------------------------------------------------------------------*/
-
+#define _GLIBCXX_USE_CXX11_ABI 0
 #include "CivetServer.h"
 #include "PeerConnectionManager.h"
 

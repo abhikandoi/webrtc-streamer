@@ -7,7 +7,10 @@
 **
 ** -------------------------------------------------------------------------*/
 
+
 #ifdef HAVE_LIVE555
+
+#define _GLIBCXX_USE_CXX11_ABI 0
 
 #include "rtc_base/timeutils.h"
 #include "rtc_base/logging.h"
