@@ -5,14 +5,13 @@
 <script src="janusvideoroom.json" ></script>
 <script src="janusvideoroom.js" ></script>
 <script src="webrtcstreamer.js" ></script>
-<style media="screen" type="text/css">
-video {
-    display: block; 
-    margin: 0 auto;
+<style type="text/css">
+.cell {
+  display: flex;
+  align-items: center;
 }
-button {
-    display: block; 
-    margin: 0 auto;
+footer {
+    text-align: center; 
 }
 </style> 
 </head>
@@ -20,6 +19,7 @@ button {
 	Janus Url:<input id="janusUrl" type="text" size="50" /> 
 	Room id:<input id="janusRoom" type="number" />
 	<div id="myGrid" style="height: 80%;" class="ag-fresh"></div>
+	<footer id="footer"></footer>
 </body>
 <script>
 	// set default value
@@ -30,11 +30,11 @@ button {
 	
 	// columns
 	var columnDefs = [
-	    { headerName: "Video"  , field: "video",  width:72,  cellRenderer: function(params) { return "<video onclick='window.open(\"/webrtcstream.html?video=" + params.data.url + "\")' width=\"72\" height=\"60\" id=\"" + params.data.url + "\"/>"; } },
-	    { headerName: "Url"    , field: "url"    },
-	    { headerName: "Status" , field: "status", cellRenderer: function(params) { return '<b>' + params.value.toUpperCase() + '</b>'; } },
-	    { headerName: "RoomId" , field: "roomid" },
-	    { headerName: "Action" , 
+	    { headerName: "Video"  , field: "video" , cellClass: "cell" ,  width:72,  cellRenderer: function(params) { return "<video onclick='window.open(\"/webrtcstream.html?video=" + params.data.url + "\")' width=\"72\" height=\"60\" id=\"" + params.data.url + "\"/>"; } },
+	    { headerName: "Url"    , field: "url"   , cellClass: "cell" },
+	    { headerName: "Status" , field: "status", cellClass: "cell" , cellRenderer: function(params) { return '<b>' + params.value.toUpperCase() + '</b>'; } },
+	    { headerName: "RoomId" , field: "roomid", cellClass: "cell"  },
+	    { headerName: "Action" , cellClass: "cell", 
 	      field: "action", 
 	      cellRenderer: function(params) { 
 	        var eDiv = document.createElement('div');
@@ -112,12 +112,24 @@ button {
 		});
 	}
 	
+	// ------------------------------------------
+	// Fill version
+	// ------------------------------------------	
+	function onVersion(version) {
+		document.getElementById("footer").innerHTML = "<p><a href='https://github.com/mpromonet/webrtc-streamer'>WebRTC-Streamer</a>"
+							+ " " + version.split(" ")[0] + "</p>";
+	}
+		
 	// load
 	window.onload         = function() { 
 		request( 'GET',  "/getVideoDeviceList" ).done(
 			function (response) {
 				if (response.statusCode === 200) { onGetDeviceList(JSON.parse(response.body)) }
-			})
+			});
+		request( 'GET',  "/version" ).done(
+			function (response) {
+				if (response.statusCode === 200) { onVersion(response.body) }
+			});
 	} 
 	
 	// unload

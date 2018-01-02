@@ -71,12 +71,13 @@ Usage
          	-H [hostname:]port : HTTP server binding (default 0.0.0.0:8000)
          	-S[stun_address]   : start embeded STUN server bind to address (default 0.0.0.0:3478)
          	-s[stun_address]   : use an external STUN server (default stun.l.google.com:19302)
-                -t[username:password@]turn_address : use an external TURN relay server (default disabled)		
-                -a[audio layer]    : spefify audio capture layer to use (default:3)		
+         	-t[username:password@]turn_address : use an external TURN relay server (default disabled)		
+        	-a[audio layer]    : spefify audio capture layer to use (default:3)		
          	[url]              : url to register in the source list
         	-v[v[v]]           : verbosity
         	-V                 : print version
 
+Arguments of '-H' is forwarded to option 'listening_ports' of civetweb, then it is possible to use the civetweb syntax like '-H8000,9000' or '-H8080r,8443'.
 
 Example
 -----
@@ -137,6 +138,8 @@ A short sample to publish WebRTC streams to Janus Video Room could be :
 	</head>
 	</html>
 
+[![Screenshot](janusvideoroom.png)](https://webrtc-streamer.herokuapp.com/janusvideoroom.html)
+
 [Live Demo](https://webrtc-streamer.herokuapp.com/janusvideoroom.html)
 
 This way the communication between [Janus API](https://janus.conf.meetecho.com/docs/JS.html) and [WebRTC Streamer API](https://webrtc-streamer.herokuapp.com/help) is implemented in Javascript running in browser.
@@ -155,15 +158,20 @@ You can start the application using the docker image :
 
         docker run -p 8000:8000 -it mpromonet/webrtc-streamer
 
-The container accept arguments that are forward to webrtc-streamer application, then you can :
+You can expose V4L2 devices from your host using :
+
+        docker run --device=/dev/video0 -p 8000:8000 -it mpromonet/webrtc-streamer
+
+The container entry point is the webrtc-streamer application, then you can :
 
 * get the help using :
 
         docker run -p 8000:8000 -it mpromonet/webrtc-streamer -h
 
-* expose the V4L2 device /dev/video0 using :
+* run the container registering a RTSP url using :
 
-        docker run --device=/dev/video0 -p 8000:8000 -it mpromonet/webrtc-streamer
+        docker run -p 8000:8000 -it mpromonet/webrtc-streamer -n raspicam -u rtsp://pi2.local:8554/unicast
+
 
 
 
