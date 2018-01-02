@@ -43,7 +43,9 @@ RTSPVideoCapturer::RTSPVideoCapturer(const std::string & uri, int timeout, const
 
 RTSPVideoCapturer::~RTSPVideoCapturer()
 {
+	RTC_LOG(LS_VERBOSE) << "RTSPVideoCapturer::~RTSPVideoCapturer firstline";
 	h264_free(m_h264);
+	RTC_LOG(LS_VERBOSE) << "RTSPVideoCapturer::~RTSPVideoCapturer lastline";
 }
 
 bool RTSPVideoCapturer::onNewSession(const char* id,const char* media, const char* codec, const char* sdp)
@@ -54,6 +56,7 @@ bool RTSPVideoCapturer::onNewSession(const char* id,const char* media, const cha
 		
 		if (strcmp(codec, "H264") == 0)
 		{
+			RTC_LOG(INFO) << "GOT H264 codec!";
 			m_codec = codec;
 			const char* pattern="sprop-parameter-sets=";
 			const char* sprop=strstr(sdp, pattern);
@@ -90,6 +93,7 @@ bool RTSPVideoCapturer::onNewSession(const char* id,const char* media, const cha
 		}
 		else if (strcmp(codec, "JPEG") == 0) 
 		{
+			RTC_LOG(INFO) << "GOT JPEG codec!";
 			m_codec = codec;
 			success = true;
 		}
@@ -228,15 +232,19 @@ cricket::CaptureState RTSPVideoCapturer::Start(const cricket::VideoFormat& forma
 
 void RTSPVideoCapturer::Stop()
 {
+	RTC_LOG(LS_VERBOSE) << "RTSPVideoCapturer::Stop() started";
 	m_env.stop();
 	rtc::Thread::Stop();
 	SetCaptureFormat(NULL);
 	SetCaptureState(cricket::CS_STOPPED);
+	RTC_LOG(LS_VERBOSE) << "RTSPVideoCapturer::Stop() done";
 }
 
 void RTSPVideoCapturer::Run()
 {
+	RTC_LOG(LS_VERBOSE) << "RTSPVideoCapturer::Run() started";
 	m_env.mainloop();
+	RTC_LOG(LS_VERBOSE) << "RTSPVideoCapturer::Run() lastline";
 }
 
 bool RTSPVideoCapturer::GetPreferredFourccs(std::vector<unsigned int>* fourccs)

@@ -12,6 +12,7 @@
 
 #include <string>
 
+#include "api/audio_codecs/builtin_audio_encoder_factory.h"
 #include "api/peerconnectioninterface.h"
 #include "api/test/fakeconstraints.h"
 
@@ -151,16 +152,36 @@ class PeerConnectionManager {
 			, m_localChannel(NULL)
 			, m_remoteChannel(NULL)
 			, iceCandidateList_(Json::arrayValue) {
-				m_pc = m_peerConnectionManager->peer_connection_factory_->CreatePeerConnection(config,
-							    &constraints,
-							    NULL,
-							    NULL,
-							    this);
+				try {
+					// rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConFac(webrtc::CreatePeerConnectionFactory(
+					// 	rtc::Thread::Current(),
+			  //           rtc::Thread::Current(),
+			  //           NULL,
+			  //           m_peerConnectionManager->audioDeviceModule_,
+			  //           webrtc::CreateBuiltinAudioEncoderFactory(),
+			  //           m_peerConnectionManager->audioDecoderfactory_,
+			  //           NULL,
+			  //           NULL
+			  //       ));
+			  //       // m_peerConnectionManager->peer_connection_factory_ = peerConFac;
+			  //       // m_pc = peerConFac->CreatePeerConnection(config,
+					// 			   //  &constraints,
+					// 			   //  NULL,
+					// 			   //  NULL,
+					// 			   //  this);
+					m_pc = m_peerConnectionManager->peer_connection_factory_->CreatePeerConnection(config,
+								    &constraints,
+								    NULL,
+								    NULL,
+								    this);
+				} catch(int e) {
+					RTC_LOG(WARNING) << __PRETTY_FUNCTION__ << "peer_connection_factory_->CreatePeerConnection failed";
+				}
 
 				m_statsCallback = new rtc::RefCountedObject<PeerConnectionStatsCollectorCallback>();
 				
-				rtc::scoped_refptr<webrtc::DataChannelInterface>   channel = m_pc->CreateDataChannel("ServerDataChannel", NULL);
-				m_localChannel = new DataChannelObserver(channel);
+				//rtc::scoped_refptr<webrtc::DataChannelInterface>   channel = m_pc->CreateDataChannel("ServerDataChannel", NULL);
+				//m_localChannel = new DataChannelObserver(channel);
 			};
 
 			virtual ~PeerConnectionObserver() {
@@ -201,7 +222,9 @@ class PeerConnectionManager {
 				m_remoteChannel = new DataChannelObserver(channel);
 			}
 			virtual void OnRenegotiationNeeded()                              {
-				RTC_LOG(LERROR) << __PRETTY_FUNCTION__ << " peerid:" << m_peerid;;
+				RTC_LOG(LERROR) << __PRETTY_FUNCTION__ << " peerid:" << m_peerid;
+				//iceCandidateList_.clear();
+				//m_peerConnectionManager->hangUp(m_peerid);
 			}
 
 			virtual void OnIceCandidate(const webrtc::IceCandidateInterface* candidate);
@@ -235,7 +258,9 @@ class PeerConnectionManager {
 	};
 
 	public:
-		PeerConnectionManager(const std::string & stunurl, const std::string & turnurl, const std::map<std::string,std::string> & urlList, const webrtc::AudioDeviceModule::AudioLayer audioLayer);
+		PeerConnectionManager(const std::string & stunurl,
+			const std::string & turnurl,
+			const webrtc::AudioDeviceModule::AudioLayer audioLayer);
 		virtual ~PeerConnectionManager();
 
 		bool InitializePeerConnection();
@@ -246,7 +271,7 @@ class PeerConnectionManager {
 		const Json::Value getAudioDeviceList();
 		const Json::Value getMediaList();
 		const Json::Value hangUp(const std::string &peerid);
-		const Json::Value call(const std::string &peerid, const std::string & videourl, const std::string & audiourl, const std::string & options, const Json::Value& jmessage);
+		const Json::Value call(const std::string &peerid, const std::string &pipename, const std::string & audiourl, const std::string & options, const Json::Value& jmessage);
 		const Json::Value getIceServers(const std::string& clientIp);
 		const Json::Value getPeerConnectionList();
 		const Json::Value getStreamList();
@@ -255,9 +280,9 @@ class PeerConnectionManager {
 
 
 	protected:
-		PeerConnectionObserver*                 CreatePeerConnection(const std::string& peerid);
-		bool                                    AddStreams(webrtc::PeerConnectionInterface* peer_connection, const std::string & videourl, const std::string & audiourl, const std::string & options);
-		rtc::scoped_refptr<webrtc::VideoTrackInterface> CreateVideoTrack(const std::string & videourl, const std::string & options);
+		PeerConnectionObserver*                 CreatePeerConnection(const std::string& peerid, webrtc::PeerConnectionInterface::RTCConfiguration &config);
+		bool                                    AddStream(webrtc::PeerConnectionInterface* peer_connection, const std::string & videourl, const std::string & audiourl, const std::string & options);
+		rtc::scoped_refptr<webrtc::VideoTrackInterface> CreateVideoTrack(const std::string &pipename, const std::string & options);
 		rtc::scoped_refptr<webrtc::AudioTrackInterface> CreateAudioTrack(const std::string & audiourl, const std::string & options);
 		bool                                    streamStillUsed(const std::string & streamLabel);
 
@@ -271,8 +296,6 @@ class PeerConnectionManager {
 		std::string                                                               turnurl_;
 		std::string                                                               turnuser_;
 		std::string                                                               turnpass_;
-		const std::map<std::string,std::string>                                   urlList_;
-		std::map<std::string,std::string>                                         m_videoaudiomap;
 };
 
 #endif

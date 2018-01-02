@@ -90,6 +90,27 @@ h264bitstream/.libs/libh264bitstream.a: h264bitstream/Makefile
 CFLAGS += -I h264bitstream
 LDFLAGS += h264bitstream/.libs/libh264bitstream.a
 
+
+#libzmq
+VERSION+=libzmq@$(shell git -C libzmq describe --tags --always --dirty)
+LIBS+=libzmq/src/.libs/libzmq.a
+libzmq/Makefile:
+	git submodule update --init libzmq
+
+libzmq/.libs/libzmq.a: libzmq/Makefile
+	cd libzmq && ./autogen.sh
+	cd libzmq && CC=$(CXX) ./configure --host=$(shell $(CXX) -dumpmachine)
+	make -C libzmq
+	make -C libzmq install
+
+CFLAGS += -I zeromq -I /usr/local/include
+LDFLAGS += libzmq/src/.libs/libzmq.a
+
+LDFLAGS += -L/usr/local/lib -lzmq -lopencv_core -lopencv_highgui -lopencv_imgproc
+
+# for dependencies of opencv and zmq
+LDFLAGS += -Wl,-rpath,/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu
+
 src/%.o: src/%.cpp $(LIBS)
 	$(CXX) -o $@ -c $< $(CFLAGS) -DVERSION="\"$(VERSION)\""
 
@@ -102,6 +123,7 @@ clean:
 	make -C civetweb clean
 	make -C h264bitstream clean
 	make -k -C live555helper clean
+	make -C libzmq clean
 
 install: $(TARGET)
 	install -m 0755 $(TARGET) /usr/local/bin

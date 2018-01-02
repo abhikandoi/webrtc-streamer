@@ -11,6 +11,8 @@
 
 #include "HttpServerRequestHandler.h"
 
+#include "rtc_base/logging.h"
+
 /* ---------------------------------------------------------------------------
 **  Civet HTTP callback
 ** -------------------------------------------------------------------------*/
@@ -149,6 +151,7 @@ HttpServerRequestHandler::HttpServerRequestHandler(PeerConnectionManager* webRtc
 		if (req_info->query_string) {
             CivetServer::getParam(req_info->query_string, "peerid", peerid);
         }
+        RTC_LOG(LS_ERROR) << "herehere12";
 		return m_webRtcServer->hangUp(peerid);
 	};
 

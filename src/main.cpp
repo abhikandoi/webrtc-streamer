@@ -24,11 +24,11 @@ int main(int argc, char* argv[])
 	const char* turnurl       = "";
 	const char* defaultlocalstunurl  = "0.0.0.0:3478";
 	const char* localstunurl  = NULL;
-	const char* stunurl       = "stun.l.google.com:19302";
+	const char* stunurl       = "global.stun.twilio.com:3478?transport=udp";
 	int logLevel              = rtc::LERROR;
 	const char* webroot       = "./html";
 	std::string sslCertificate;
-	webrtc::AudioDeviceModule::AudioLayer audioLayer = webrtc::AudioDeviceModule::kLinuxAlsaAudio;
+	webrtc::AudioDeviceModule::AudioLayer audioLayer = webrtc::AudioDeviceModule::kDummyAudio;
 	std::string streamName;
 	std::map<std::string,std::string> urlList;
 
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 	rtc::InitializeSSL();
 
 	// webrtc server
-	PeerConnectionManager webRtcServer(stunurl, turnurl, urlList, audioLayer);
+	PeerConnectionManager webRtcServer(stunurl, turnurl, audioLayer);
 	if (!webRtcServer.InitializePeerConnection())
 	{
 		std::cout << "Cannot Initialize WebRTC server" << std::endl;
@@ -123,6 +123,8 @@ int main(int argc, char* argv[])
 	{
 		// http server
 		std::vector<std::string> options;
+		// options.push_back("num_threads");
+		// options.push_back("1");
 		options.push_back("document_root");
 		options.push_back(webroot);
 		options.push_back("access_control_allow_origin");
