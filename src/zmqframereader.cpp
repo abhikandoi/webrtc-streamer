@@ -100,8 +100,7 @@ void ZMQFrameReader::Run()
 {
 	// do here
     cv::Mat frame;
-    int res = 0;
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
     int64_t ts;
 
     while(this->running) {
@@ -110,8 +109,9 @@ void ZMQFrameReader::Run()
 	    if(recvd) {
 	    	RTC_LOG(LS_VERBOSE) << "ZMQFrameReader::Run " << "recvd frame for pipename=" << this->pipename;
 
-	    	auto elapsed = std::chrono::high_resolution_clock::now() - start;
-	    	ts = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+	    	//auto elapsed = std::chrono::high_resolution_clock::now() - start;
+	    	//ts = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+            ts = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 	        std::string encoded_string = std::string(static_cast<char *>(msg.data()), msg.size());
 	        std::string decoded_string = base64_decode(encoded_string);
 	        std::vector<uchar> data(decoded_string.begin(), decoded_string.end());
@@ -138,11 +138,10 @@ void ZMQFrameReader::Run()
 							libyuv::kRotate0, ::libyuv::FOURCC_ARGB);									
 
 			if (conversionResult >= 0) {
-				webrtc::VideoFrame frame(I420buffer, 0, ts * 1000, webrtc::kVideoRotation_0);
+				webrtc::VideoFrame frame(I420buffer, 0, ts / 1000, webrtc::kVideoRotation_0);
 				this->Decoded(frame);
 			} else {
 				RTC_LOG(LS_ERROR) << "ZMQFrameReader:Run decoder error:" << conversionResult;
-				res = -1;
 			}
 	    } else {
 	    	RTC_LOG(LS_VERBOSE) << "ZMQFrameReader::Run " << "no frame recvd for pipename=" << this->pipename;
